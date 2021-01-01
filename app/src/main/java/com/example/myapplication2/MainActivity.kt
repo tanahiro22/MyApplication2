@@ -9,34 +9,73 @@ import android.view.MenuItem
 import android.view.View
 import android.content.Intent
 import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val button : Button = findViewById(R.id.button)
-        button.setOnClickListener{
-            val intent = Intent(this, MainActivity2::class.java)
-            startActivity(intent)
+        auth = FirebaseAuth.getInstance()
+
+        val buttonSignUp = findViewById<Button>(R.id.SignUpButton)
+        val buttonLogin = findViewById<Button>(R.id.LoginButton)
+
+
+
+        buttonSignUp.setOnClickListener {
+
+            val emailEditText = findViewById<EditText>(R.id.emailEditText)
+            val emailText = emailEditText.text.toString()
+
+            val passEditText = findViewById<EditText>(R.id.passEditText)
+            val passText = passEditText.text.toString()
+
+
+            auth.createUserWithEmailAndPassword(emailText, passText)
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        Toast.makeText(
+                            baseContext, "SignUp 成功",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        Toast.makeText(
+                            baseContext, "SignUp 失敗",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
         }
 
-    }
+        buttonLogin.setOnClickListener {
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
+            val emailEditText = findViewById<EditText>(R.id.emailEditText)
+            val emailText = emailEditText.text.toString()
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        return when (item.itemId) {
-            R.id.action_settings -> true
-            else -> super.onOptionsItemSelected(item)
+            val passEditText = findViewById<EditText>(R.id.passEditText)
+            val passText = passEditText.text.toString()
+
+            auth.signInWithEmailAndPassword(emailText, passText)
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        Toast.makeText(
+                            baseContext, "Login 成功",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        Toast.makeText(
+                            baseContext, "Login 失敗",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                }
+
         }
     }
 }
